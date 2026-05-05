@@ -11,7 +11,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +27,6 @@ import java.util.Set;
 @Slf4j
 public class ApplicationInitConfig {
 
-    PasswordEncoder passwordEncoder;
-    RoleRepository roleRepository;
     // Trong file ApplicationInitConfig.java
 
     @Bean
@@ -52,6 +49,8 @@ public class ApplicationInitConfig {
                 User user = User.builder()
                         .username("ChuThuVien")
                         .password(passwordEncoder.encode("ChuThuVien"))
+                        .status("ACTIVE")
+                        .failedLoginAttempts(0)
                         .build();
 
                 String[] INIT_ROLES = {
@@ -65,7 +64,7 @@ public class ApplicationInitConfig {
                 user.setRoles(roles);
                 userRepository.save(user);
 
-                log.warn("Admin user created!");
+                log.warn("Chu thu vien user created!");
             }
         }
     }

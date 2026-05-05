@@ -18,4 +18,5 @@ public class PhieuDatTruocResponse {
     String email;
     String dauSachId;
     String title;
+    Integer queuePosition;
 }

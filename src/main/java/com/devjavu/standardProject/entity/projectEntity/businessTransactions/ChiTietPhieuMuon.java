@@ -18,7 +18,10 @@ public class ChiTietPhieuMuon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
      Long id;
      LocalDate returnDate;
+     LocalDate dueDate;
      String status;
+     @Builder.Default
+     int renewalCount = 0;
 
     @ManyToOne
      PhieuMuon phieuMuon;

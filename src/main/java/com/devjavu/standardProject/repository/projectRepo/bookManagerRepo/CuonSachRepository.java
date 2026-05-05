@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface CuonSachRepository extends JpaRepository<CuonSach,String> {
     List<CuonSach> findAllByDauSach(DauSach dauSach);
+    List<CuonSach> findAllByBarcodeStartingWith(String prefix);
 }

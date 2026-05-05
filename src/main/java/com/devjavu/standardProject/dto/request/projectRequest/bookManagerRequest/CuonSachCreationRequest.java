@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CuonSachCreationRequest {
-    String location;
     String status;
+    String physicalCondition;
     String dauSach;
 }

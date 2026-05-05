@@ -33,14 +33,14 @@ public class UserController {
                 .result(userService.createUser(request))
                 .build();
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('CHU_THU_VIEN')")
     @GetMapping
     public ApiResponse<List<UserResponse>> getUser(){
         return ApiResponse.<List<UserResponse>>builder()
                 .result(userService.getUser())
                 .build();
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('CHU_THU_VIEN')")
     @PutMapping("{username}")
     public ApiResponse<UserResponse> updateUser(@RequestBody UserUpdateRequest request,@PathVariable String username){
         return ApiResponse.<UserResponse>builder()

@@ -18,6 +18,8 @@ public class DocGia {
      String fullName;
      String email;
      String cardType;
+     @Builder.Default
+     double balance = 0;
      int totalFines;
 
     @OneToOne

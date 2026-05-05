@@ -15,5 +15,4 @@ public class PhieuPhatRequest {
     String reason;
     boolean paid;
     String phieuMuonId;
-    String cuonSachBarcode;
 }

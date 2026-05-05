@@ -13,8 +13,5 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PhieuDatTruocRequest {
-    LocalDate reservationDate;
-    String status;
-    String email;
     String dauSachId;
 }

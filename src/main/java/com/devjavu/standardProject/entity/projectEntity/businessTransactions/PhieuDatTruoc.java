@@ -24,6 +24,9 @@ public class PhieuDatTruoc {
      String id;
      LocalDate reservationDate;
      String status;
+     Long priority;
+     LocalDate confirmedDate;
+     LocalDate pickupDate;
 
     @ManyToOne
      DocGia docGia;

@@ -25,14 +25,14 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class PermissionController {
     PermissionService permissionService;
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('CHU_THU_VIEN')")
     @PostMapping
     public ApiResponse<PermissionResponse> createPermission(@RequestBody PermissionRequest request){
         return ApiResponse.<PermissionResponse>builder()
                 .result(permissionService.createPermission(request))
                 .build();
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('CHU_THU_VIEN')")
     @GetMapping
     public  ApiResponse<List<PermissionResponse>> getPermissions(){
         return ApiResponse.<List<PermissionResponse>>builder()
@@ -40,7 +40,7 @@ public class PermissionController {
                 .build();
     }
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('CHU_THU_VIEN')")
     @DeleteMapping("/{name}")
     public ApiResponse<?> deletePermission(@PathVariable String name){
         permissionService.deletePermission(name);

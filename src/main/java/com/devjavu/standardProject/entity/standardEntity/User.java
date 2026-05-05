@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -19,6 +19,11 @@ public class User {
     String id;
     String username;
     String password;
+    @Builder.Default
+    String status = "ACTIVE";
+    @Builder.Default
+    int failedLoginAttempts = 0;
+    LocalDateTime lockedUntil;
 
     @ManyToMany
     Set<Role> roles;

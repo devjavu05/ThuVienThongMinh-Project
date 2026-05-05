@@ -12,11 +12,11 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class CuonSach {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
      String barcode;
      int stt;
      String location;
      String status;
+     String physicalCondition;
      boolean isAvailable;
 
     @ManyToOne

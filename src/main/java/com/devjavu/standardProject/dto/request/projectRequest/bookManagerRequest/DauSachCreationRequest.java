@@ -15,5 +15,10 @@ public class DauSachCreationRequest {
     String author;
     String category;
     String description;
+    String longIntroduction;
+    Integer floorNumber;
+    Integer publishYear;
+    String coverImageUrl;
+    Double averageRating;
 
 }

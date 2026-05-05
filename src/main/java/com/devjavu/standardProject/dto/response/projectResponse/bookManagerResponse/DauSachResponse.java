@@ -14,5 +14,12 @@ public class DauSachResponse {
     String author;
     String category;
     String description;
+    String longIntroduction;
+    Integer floorNumber;
+    String shelfCode;
+    String defaultLocation;
+    Integer publishYear;
+    String coverImageUrl;
+    Double averageRating;
     int quantity;
 }

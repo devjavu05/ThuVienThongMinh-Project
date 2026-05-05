@@ -11,6 +11,8 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface CuonSachMapper {
     @Mapping(target = "dauSach", source = "dauSach.id")
+    @Mapping(target = "location", expression = "java(cuonSach.getDauSach() != null ? com.devjavu.standardProject.configuration.ShelfLocationCatalog.buildBookLocation(cuonSach.getDauSach().getFloorNumber(), cuonSach.getDauSach().getCategory()) : null)")
+    @Mapping(target = "defaultLocation", expression = "java(cuonSach.getDauSach() != null ? com.devjavu.standardProject.configuration.ShelfLocationCatalog.buildBookLocation(cuonSach.getDauSach().getFloorNumber(), cuonSach.getDauSach().getCategory()) : null)")
     CuonSachResponse toCuonSachResponse(CuonSach cuonSach);
     @Mapping(target = "dauSach",ignore = true)
     CuonSach toCuonSach(CuonSachCreationRequest request);

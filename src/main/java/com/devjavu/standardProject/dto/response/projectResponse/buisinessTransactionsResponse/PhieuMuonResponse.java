@@ -14,6 +14,8 @@ public class PhieuMuonResponse {
     String id;
     LocalDate borrowDate;
     LocalDate dueDate;
+    boolean editable;
+    int renewalCount;
 
     String fullName;
     String email;

@@ -13,7 +13,9 @@ import java.time.LocalDate;
 public class ChiTietPhieuMuonResponse {
     Long id;
     LocalDate returnDate;
+    LocalDate dueDate;
     String status;
+    int renewalCount;
     String phieuMuonId;
     String cuonSachBarcode;
     String bookTitle;

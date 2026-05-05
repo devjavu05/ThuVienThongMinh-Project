@@ -19,6 +19,12 @@ public class EBook {
      String accessLink;
      String format;
      double fileSize;
+     double price;
+     boolean premiumOnly;
+     @Builder.Default
+     boolean downloadable = true;
+     @Builder.Default
+     boolean underMaintenance = false;
 
     @OneToOne
     @MapsId

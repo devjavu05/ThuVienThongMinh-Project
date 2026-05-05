@@ -25,21 +25,21 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class RoleController {
     RoleService roleService;
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('CHU_THU_VIEN')")
     @PostMapping
     public ApiResponse<RoleResponse> createRole(@RequestBody RoleRequest request){
         return ApiResponse.<RoleResponse>builder()
                 .result(roleService.createRole(request))
                 .build();
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('CHU_THU_VIEN')")
     @GetMapping
     public ApiResponse<List<RoleResponse>> getRole(){
         return ApiResponse.<List<RoleResponse>>builder()
                 .result(roleService.getRole())
                 .build();
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('CHU_THU_VIEN')")
     @DeleteMapping("{role}")
     public ApiResponse<String> deleteRole(@PathVariable String role){
         roleService.deleteRole(role);

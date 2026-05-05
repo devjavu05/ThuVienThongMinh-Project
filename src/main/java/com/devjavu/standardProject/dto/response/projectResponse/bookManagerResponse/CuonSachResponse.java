@@ -13,6 +13,8 @@ public class CuonSachResponse {
     int stt;
     String location;
     String status;
+    String physicalCondition;
+    String defaultLocation;
 
     String dauSach;
 }

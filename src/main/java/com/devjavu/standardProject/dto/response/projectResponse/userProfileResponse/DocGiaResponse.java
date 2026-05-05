@@ -12,4 +12,6 @@ public class DocGiaResponse {
     String username;
     String email;
     String fullName;
+    String cardType;
+    double balance;
 }

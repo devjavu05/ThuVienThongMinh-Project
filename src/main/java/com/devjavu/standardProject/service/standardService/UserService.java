@@ -39,6 +39,9 @@ public class UserService {
         }
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setStatus("ACTIVE");
+        user.setFailedLoginAttempts(0);
+        user.setLockedUntil(null);
         String[] INIT_ROLES ={StandardRoles.USER.name()};
         Set<Role> roles = new HashSet<>(roleRepository.findAllById(List.of(INIT_ROLES)));
         user.setRoles(roles);
@@ -56,6 +59,9 @@ public class UserService {
         Set<Role> roles = new HashSet<>(roleRepository.findAllById(request.getRoles()));
         user.setRoles(roles);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        if (user.getStatus() == null) {
+            user.setStatus("ACTIVE");
+        }
         return  userMapper.toUserResponse(userRepository.save(user));
 
     }
