@@ -93,7 +93,7 @@ public class BookController {
                 .build();
     }
 
-    @PreAuthorize("hasAuthority('GET_CUON_SACH')")
+    @PreAuthorize("hasAnyRole('NHAN_VIEN','CHU_THU_VIEN','ADMIN') or hasAuthority('GET_CUON_SACH')")
     @GetMapping("/inventory")
     public ApiResponse<TraCuuThuThuResponse> getInventory(
             @RequestParam(required = false) String q,
