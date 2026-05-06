@@ -22,4 +22,12 @@ public class DauSachResponse {
     String coverImageUrl;
     Double averageRating;
     int quantity;
+    boolean hasEBook;
+    String eBookLink;
+    String eBookFormat;
+    Double eBookFileSize;
+    Double eBookPrice;
+    Boolean eBookPremiumOnly;
+    Boolean eBookDownloadable;
+    Boolean eBookUnderMaintenance;
 }

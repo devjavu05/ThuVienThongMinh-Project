@@ -21,4 +21,10 @@ public class DauSachUpdateRequest {
     String coverImageUrl;
     Double averageRating;
     String accessLink;
+    String eBookFormat;
+    Double eBookFileSize;
+    Double eBookPrice;
+    Boolean eBookPremiumOnly;
+    Boolean eBookDownloadable;
+    Boolean eBookUnderMaintenance;
 }

@@ -22,4 +22,10 @@ public class QuanLyKhoCreateRequest {
     Integer copyCount;
     String physicalCondition;
     String accessLink;
+    String eBookFormat;
+    Double eBookFileSize;
+    Double eBookPrice;
+    Boolean eBookPremiumOnly;
+    Boolean eBookDownloadable;
+    Boolean eBookUnderMaintenance;
 }

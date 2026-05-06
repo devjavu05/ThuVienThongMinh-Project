@@ -20,6 +20,7 @@ import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransac
 import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransactionsResponse.DanhGiaResponse;
 import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransactionsResponse.LichSuMuonTraResponse;
 import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransactionsResponse.PhieuDatTruocResponse;
+import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransactionsResponse.AdminRevenueResponse;
 import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransactionsResponse.PhieuMuaResponse;
 import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransactionsResponse.PhieuMuonResponse;
 import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransactionsResponse.PhieuPhatResponse;
@@ -427,6 +428,14 @@ public class BookController {
     public ApiResponse<PhieuPhatResponse> payPhieuPhat(@PathVariable String id) {
         return ApiResponse.<PhieuPhatResponse>builder()
                 .result(bookService.payPhieuPhat(id))
+                .build();
+    }
+
+    @PreAuthorize("hasAnyRole('CHU_THU_VIEN','ADMIN')")
+    @GetMapping("/admin/revenue")
+    public ApiResponse<AdminRevenueResponse> getAdminRevenue() {
+        return ApiResponse.<AdminRevenueResponse>builder()
+                .result(bookService.getAdminRevenue())
                 .build();
     }
 }

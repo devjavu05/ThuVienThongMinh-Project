@@ -12,4 +12,6 @@ import java.util.List;
 public interface PhieuPhatRepository extends JpaRepository<PhieuPhat,String> {
     List<PhieuPhat> findAllByPhieuMuon_NguoiMuonOrderByIdDesc(DocGia docGia);
     List<PhieuPhat> findAllByPhieuMuon(PhieuMuon phieuMuon);
+    long countByPaidTrue();
+    long countByPaidFalse();
 }

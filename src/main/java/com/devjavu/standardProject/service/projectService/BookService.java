@@ -25,6 +25,7 @@ import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransac
 import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransactionsResponse.LichSuMuonTraItemResponse;
 import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransactionsResponse.LichSuMuonTraResponse;
 import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransactionsResponse.PhieuDatTruocResponse;
+import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransactionsResponse.AdminRevenueResponse;
 import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransactionsResponse.PhieuMuaResponse;
 import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransactionsResponse.PhieuMuonResponse;
 import com.devjavu.standardProject.dto.response.projectResponse.buisinessTransactionsResponse.PhieuPhatResponse;
@@ -228,7 +229,7 @@ public class BookService {
                 .tinhTrang(buildAvailabilityText(availableCount, eBook))
                 .viTriKe(viTriKe)
                 .hasEBook(eBook != null && StringUtils.hasText(eBook.getAccessLink()))
-                .eBookLink(eBook != null ? eBook.getAccessLink() : null)
+                .eBookLink(null)
                 .eBookFormat(eBook != null ? eBook.getFormat() : null)
                 .eBookFileSize(eBook != null ? eBook.getFileSize() : null)
                 .eBookPrice(eBook != null ? eBook.getPrice() : null)
@@ -236,7 +237,7 @@ public class BookService {
                 .eBookDownloadable(eBook != null && eBook.isDownloadable())
                 .eBookUnderMaintenance(eBook != null && eBook.isUnderMaintenance())
                 .eBookOwned(owned)
-                .ownedAccessLink(owned && eBook != null ? eBook.getAccessLink() : null)
+                .ownedAccessLink(owned && eBook != null && eBook.isDownloadable() ? eBook.getAccessLink() : null)
                 .canReview(canReview)
                 .build();
     }
@@ -294,13 +295,14 @@ public class BookService {
 
         docGia.setBalance(docGia.getBalance() - eBook.getPrice());
         docGiaRepository.save(docGia);
+        String unlockedAccessLink = eBook.isDownloadable() ? eBook.getAccessLink() : null;
 
         PhieuMua phieuMua = PhieuMua.builder()
                 .docGia(docGia)
                 .eBook(eBook)
                 .purchaseTime(LocalDateTime.now())
                 .amount(eBook.getPrice())
-                .accessLink(eBook.getAccessLink())
+                .accessLink(unlockedAccessLink)
                 .build();
 
         PhieuMua saved = phieuMuaRepository.save(phieuMua);
@@ -336,7 +338,10 @@ public class BookService {
         dauSach.setQuantity(0);
         dauSach.setCreatedAt(LocalDateTime.now());
         dauSach.setAverageRating(request.getAverageRating() == null ? 0.0 : request.getAverageRating());
-        return dauSachMapper.toDauSachResponse(dauSachRepository.save(dauSach));
+        DauSach savedBook = dauSachRepository.save(dauSach);
+        syncEBook(savedBook, request.getAccessLink(), request.getEBookFormat(), request.getEBookFileSize(), request.getEBookPrice(),
+                request.getEBookPremiumOnly(), request.getEBookDownloadable(), request.getEBookUnderMaintenance());
+        return toDauSachResponseWithEBook(savedBook);
     }
 
     @Transactional
@@ -358,7 +363,8 @@ public class BookService {
                 .quantity(0)
                 .build();
         DauSach savedBook = dauSachRepository.save(dauSach);
-        syncEBook(savedBook, request.getAccessLink());
+        syncEBook(savedBook, request.getAccessLink(), request.getEBookFormat(), request.getEBookFileSize(), request.getEBookPrice(),
+                request.getEBookPremiumOnly(), request.getEBookDownloadable(), request.getEBookUnderMaintenance());
 
         int copyCount = request.getCopyCount() == null ? 0 : request.getCopyCount();
         for (int index = 0; index < copyCount; index++) {
@@ -466,8 +472,9 @@ public class BookService {
         if (dauSach.getCreatedAt() == null) dauSach.setCreatedAt(LocalDateTime.now());
         if (dauSach.getAverageRating() == null) dauSach.setAverageRating(0.0);
         DauSach savedBook = dauSachRepository.save(dauSach);
-        syncEBook(savedBook, request.getAccessLink());
-        return dauSachMapper.toDauSachResponse(savedBook);
+        syncEBook(savedBook, request.getAccessLink(), request.getEBookFormat(), request.getEBookFileSize(), request.getEBookPrice(),
+                request.getEBookPremiumOnly(), request.getEBookDownloadable(), request.getEBookUnderMaintenance());
+        return toDauSachResponseWithEBook(savedBook);
     }
 
     @Transactional
@@ -533,7 +540,7 @@ public class BookService {
     }
 
     public DauSachResponse getDauSachById(String id) {
-        return dauSachMapper.toDauSachResponse(findDauSachById(id));
+        return toDauSachResponseWithEBook(findDauSachById(id));
     }
 
     public PhieuMuonResponse createPhieuMuon(PhieuMuonRequest request) {
@@ -905,9 +912,37 @@ public class BookService {
         docGia.setBalance(docGia.getBalance() - phieuPhat.getAmount());
         docGia.setTotalFines(Math.max(0, docGia.getTotalFines() - (int) phieuPhat.getAmount()));
         phieuPhat.setPaid(true);
+        phieuPhat.setPaidAt(LocalDateTime.now());
 
         docGiaRepository.save(docGia);
         return phieuPhatMapper.toPhieuPhatResponse(phieuPhatRepository.save(phieuPhat));
+    }
+
+    public AdminRevenueResponse getAdminRevenue() {
+        List<PhieuMua> purchases = phieuMuaRepository.findAll();
+        List<PhieuPhat> fines = phieuPhatRepository.findAll();
+
+        double ebookRevenue = purchases.stream()
+                .mapToDouble(PhieuMua::getAmount)
+                .sum();
+        double fineRevenue = fines.stream()
+                .filter(PhieuPhat::isPaid)
+                .mapToDouble(PhieuPhat::getAmount)
+                .sum();
+        double pendingFineAmount = fines.stream()
+                .filter(fine -> !fine.isPaid())
+                .mapToDouble(PhieuPhat::getAmount)
+                .sum();
+
+        return AdminRevenueResponse.builder()
+                .totalRevenue(ebookRevenue + fineRevenue)
+                .ebookRevenue(ebookRevenue)
+                .fineRevenue(fineRevenue)
+                .ebookPurchaseCount(phieuMuaRepository.countByPurchaseTimeIsNotNull())
+                .paidFineCount(phieuPhatRepository.countByPaidTrue())
+                .pendingFineCount(phieuPhatRepository.countByPaidFalse())
+                .pendingFineAmount(pendingFineAmount)
+                .build();
     }
 
     private void validateReaderEligible(DocGia docGia, User user) {
@@ -1159,7 +1194,7 @@ public class BookService {
                 .availableCount(availableCount)
                 .tinhTrang(buildAvailabilityText(availableCount, eBook))
                 .hasEBook(eBook != null && StringUtils.hasText(eBook.getAccessLink()))
-                .eBookLink(eBook != null ? eBook.getAccessLink() : null)
+                .eBookLink(null)
                 .build();
     }
 
@@ -1240,7 +1275,8 @@ public class BookService {
         validateFloor(request.getFloorNumber());
     }
 
-    private void syncEBook(DauSach dauSach, String accessLink) {
+    private void syncEBook(DauSach dauSach, String accessLink, String format, Double fileSize, Double price,
+                           Boolean premiumOnly, Boolean downloadable, Boolean underMaintenance) {
         EBook existing = eBookRepository.findById(dauSach.getId()).orElse(null);
         if (!StringUtils.hasText(accessLink)) {
             if (existing != null) {
@@ -1255,7 +1291,31 @@ public class BookService {
                 .build();
         eBook.setDauSach(dauSach);
         eBook.setAccessLink(accessLink);
+        eBook.setFormat(StringUtils.hasText(format) ? format : "PDF");
+        eBook.setFileSize(fileSize == null ? 0 : fileSize);
+        eBook.setPrice(price == null ? 0 : Math.max(0, price));
+        eBook.setPremiumOnly(Boolean.TRUE.equals(premiumOnly));
+        eBook.setDownloadable(downloadable == null || downloadable);
+        eBook.setUnderMaintenance(Boolean.TRUE.equals(underMaintenance));
         eBookRepository.save(eBook);
+    }
+
+    private DauSachResponse toDauSachResponseWithEBook(DauSach dauSach) {
+        DauSachResponse response = dauSachMapper.toDauSachResponse(dauSach);
+        EBook eBook = findEBookSafely(dauSach.getId());
+        if (eBook == null) {
+            response.setHasEBook(false);
+            return response;
+        }
+        response.setHasEBook(StringUtils.hasText(eBook.getAccessLink()));
+        response.setEBookLink(eBook.getAccessLink());
+        response.setEBookFormat(eBook.getFormat());
+        response.setEBookFileSize(eBook.getFileSize());
+        response.setEBookPrice(eBook.getPrice());
+        response.setEBookPremiumOnly(eBook.isPremiumOnly());
+        response.setEBookDownloadable(eBook.isDownloadable());
+        response.setEBookUnderMaintenance(eBook.isUnderMaintenance());
+        return response;
     }
 
     private String normalizeCategory(String category) {

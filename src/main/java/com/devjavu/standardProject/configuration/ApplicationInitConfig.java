@@ -48,7 +48,7 @@ public class ApplicationInitConfig {
             if (userRepository.findByUsername("ChuThuVien").isEmpty()) {
                 User user = User.builder()
                         .username("ChuThuVien")
-                        .password(passwordEncoder.encode("ChuThuVien"))
+                        .password(passwordEncoder.encode("admin"))
                         .status("ACTIVE")
                         .failedLoginAttempts(0)
                         .build();

@@ -9,6 +9,8 @@ import jakarta.persistence.OneToOne;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,6 +24,7 @@ public class PhieuPhat {
      double amount;
      String reason;
      boolean paid;
+     LocalDateTime paidAt;
 
     @OneToOne
      PhieuMuon phieuMuon;
