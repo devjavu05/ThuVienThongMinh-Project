@@ -14,11 +14,14 @@ import java.util.List;
 @Repository
 public interface PhieuMuaRepository extends JpaRepository<PhieuMua, String> {
     long countByDocGiaAndPurchaseTimeBetween(DocGia docGia, LocalDateTime start, LocalDateTime end);
-    
-    @Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM PhieuMua p WHERE p.docGia = :docGia AND p.eBook = :eBook")
+
+    @Query("SELECT COUNT(p) > 0 FROM PhieuMua p WHERE p.docGia = :docGia AND p.eBook = :eBook")
     boolean existsByDocGiaAndEBook(@Param("docGia") DocGia docGia, @Param("eBook") EBook eBook);
-    
+
     List<PhieuMua> findAllByDocGiaOrderByPurchaseTimeDesc(DocGia docGia);
-    List<PhieuMua> findAllByEBook(EBook eBook);
+
+    @Query("SELECT p FROM PhieuMua p WHERE p.eBook = :eBook")
+    List<PhieuMua> findAllByEBook(@Param("eBook") EBook eBook);
+
     long countByPurchaseTimeIsNotNull();
 }

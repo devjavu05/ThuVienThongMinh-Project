@@ -480,6 +480,21 @@ public class BookService {
     @Transactional
     public void deleteDauSach(String id) {
         DauSach dauSach = findDauSachById(id);
+        List<CuonSach> copies = cuonSachRepository.findAllByDauSach(dauSach);
+        List<PhieuPhat> finesByBook = phieuPhatRepository.findAllByCuonSach_DauSach(dauSach);
+
+        if (!finesByBook.isEmpty()) {
+            for (PhieuPhat fine : finesByBook) {
+                if (fine.getPhieuMuon() != null && fine.getPhieuMuon().getNguoiMuon() != null) {
+                    DocGia docGia = fine.getPhieuMuon().getNguoiMuon();
+                    int nextTotalFines = Math.max(0, docGia.getTotalFines() - (int) fine.getAmount());
+                    docGia.setTotalFines(nextTotalFines);
+                    docGiaRepository.save(docGia);
+                }
+            }
+            phieuPhatRepository.deleteAll(finesByBook);
+            phieuPhatRepository.flush();
+        }
 
         List<ChiTietPhieuMuon> relatedDetails = chiTietPhieuMuonRepository.findAllByCuonSach_DauSach(dauSach);
         Set<PhieuMuon> affectedTickets = new HashSet<>();
@@ -491,6 +506,7 @@ public class BookService {
 
         if (!relatedDetails.isEmpty()) {
             chiTietPhieuMuonRepository.deleteAll(relatedDetails);
+            chiTietPhieuMuonRepository.flush();
         }
 
         for (PhieuMuon phieuMuon : affectedTickets) {
@@ -507,33 +523,39 @@ public class BookService {
                         }
                     }
                     phieuPhatRepository.deleteAll(relatedFines);
+                    phieuPhatRepository.flush();
                 }
                 phieuMuonRepository.delete(phieuMuon);
             }
         }
-
-        List<PhieuDatTruoc> reservations = phieuDatTruocRepository.findAllByDauSach(dauSach);
-        if (!reservations.isEmpty()) {
-            phieuDatTruocRepository.deleteAll(reservations);
-        }
-
-        List<DanhGia> reviews = danhGiaRepository.findAllByDauSach(dauSach);
-        if (!reviews.isEmpty()) {
-            danhGiaRepository.deleteAll(reviews);
-        }
+        phieuMuonRepository.flush();
 
         EBook eBook = eBookRepository.findById(dauSach.getId()).orElse(null);
         if (eBook != null) {
             List<PhieuMua> purchases = phieuMuaRepository.findAllByEBook(eBook);
             if (!purchases.isEmpty()) {
                 phieuMuaRepository.deleteAll(purchases);
+                phieuMuaRepository.flush();
             }
             eBookRepository.delete(eBook);
+            eBookRepository.flush();
         }
 
-        List<CuonSach> copies = cuonSachRepository.findAllByDauSach(dauSach);
         if (!copies.isEmpty()) {
             cuonSachRepository.deleteAll(copies);
+            cuonSachRepository.flush();
+        }
+
+        List<PhieuDatTruoc> reservations = phieuDatTruocRepository.findAllByDauSach(dauSach);
+        if (!reservations.isEmpty()) {
+            phieuDatTruocRepository.deleteAll(reservations);
+            phieuDatTruocRepository.flush();
+        }
+
+        List<DanhGia> reviews = danhGiaRepository.findAllByDauSach(dauSach);
+        if (!reviews.isEmpty()) {
+            danhGiaRepository.deleteAll(reviews);
+            danhGiaRepository.flush();
         }
 
         dauSachRepository.delete(dauSach);

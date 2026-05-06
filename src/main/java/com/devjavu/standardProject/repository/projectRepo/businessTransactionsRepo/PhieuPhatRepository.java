@@ -1,5 +1,6 @@
 package com.devjavu.standardProject.repository.projectRepo.businessTransactionsRepo;
 
+import com.devjavu.standardProject.entity.projectEntity.bookManager.DauSach;
 import com.devjavu.standardProject.entity.projectEntity.businessTransactions.PhieuPhat;
 import com.devjavu.standardProject.entity.projectEntity.businessTransactions.PhieuMuon;
 import com.devjavu.standardProject.entity.projectEntity.userProfiles.DocGia;
@@ -12,6 +13,7 @@ import java.util.List;
 public interface PhieuPhatRepository extends JpaRepository<PhieuPhat,String> {
     List<PhieuPhat> findAllByPhieuMuon_NguoiMuonOrderByIdDesc(DocGia docGia);
     List<PhieuPhat> findAllByPhieuMuon(PhieuMuon phieuMuon);
+    List<PhieuPhat> findAllByCuonSach_DauSach(DauSach dauSach);
     long countByPaidTrue();
     long countByPaidFalse();
 }

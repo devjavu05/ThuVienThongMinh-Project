@@ -131,7 +131,7 @@ public class BookController {
     }
 
     @PreAuthorize("hasAuthority('UPDATE_DAU_SACH')")
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public ApiResponse<DauSachResponse> updateDauSach(@RequestBody DauSachUpdateRequest request, @PathVariable String id) {
         return ApiResponse.<DauSachResponse>builder()
                 .result(bookService.updateDauSach(request, id))
@@ -139,7 +139,7 @@ public class BookController {
     }
 
     @PreAuthorize("hasAuthority('UPDATE_DAU_SACH')")
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ApiResponse<String> deleteDauSach(@PathVariable String id) {
         bookService.deleteDauSach(id);
         return ApiResponse.<String>builder()
